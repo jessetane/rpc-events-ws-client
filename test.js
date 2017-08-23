@@ -1,5 +1,5 @@
 var tape = require('tape')
-var WebSocket = require('uws')
+var WebSocket = require('ws')
 var Emitter = require('events')
 var Rpc = require('rpc-events')
 var RpcEventsWsClient = require('./')
@@ -10,9 +10,9 @@ tape('open on demand unless outstanding call(s) timeout', function (t) {
     url: 'ws://127.0.0.1:7357',
     serialize: JSON.stringify,
     deserialize: JSON.parse,
-    timeout: 10, // time to wait for a call response
-    openTimeout: 10, // time to wait for underlying transport to open
-    reopenDelay: 50 // time after unexpected close before attempting to reopen
+    timeout: 100, // time to wait for a call response
+    openTimeout: 100, // time to wait for underlying transport to open
+    reopenDelay: 500 // time after unexpected close before attempting to reopen
   })
   client.open = function () {
     t.pass()
@@ -58,9 +58,9 @@ tape('try to open on demand as long as call(s) have not timed out', function (t)
     url: 'ws://127.0.0.1:7357',
     serialize: JSON.stringify,
     deserialize: JSON.parse,
-    timeout: 50,
-    openTimeout: 10,
-    reopenDelay: 10
+    timeout: 500,
+    openTimeout: 100,
+    reopenDelay: 100
   })
   client.open = function () {
     t.pass()
@@ -101,9 +101,9 @@ tape('reestablishes subscriptions after connection fails', function (t) {
     url: 'ws://127.0.0.1:7357',
     serialize: JSON.stringify,
     deserialize: JSON.parse,
-    timeout: 50,
-    openTimeout: 10,
-    reopenDelay: 10
+    timeout: 500,
+    openTimeout: 100,
+    reopenDelay: 100
   })
   var i = 0
   client.subscribe('event', function (evt) {
@@ -113,7 +113,7 @@ tape('reestablishes subscriptions after connection fails', function (t) {
       server = serve()
       setTimeout(function () {
         server.iface.emit('event', 42)
-      }, 50)
+      }, 500)
     } else if (i === 1) {
       client.close()
       server.close()
@@ -122,7 +122,7 @@ tape('reestablishes subscriptions after connection fails', function (t) {
   }, t.fail)
   setTimeout(function () {
     server.iface.emit('event', 42)
-  }, 50)
+  }, 500)
   function serve () {
     var iface = new Emitter()
     var server = new WebSocket.Server({

@@ -3,7 +3,7 @@ module.exports = RpcEventsWsClient
 var RpcEmitter = require('rpc-events')
 var inherits = require('inherits')
 var isBrowser = typeof window !== 'undefined'
-var WebSocket = isBrowser ? window.WebSocket : require('' || 'uws')
+var WebSocket = isBrowser ? window.WebSocket : require('' || 'ws')
 
 inherits(RpcEventsWsClient, RpcEmitter)
 
