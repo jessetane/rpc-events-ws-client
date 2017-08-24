@@ -35,14 +35,12 @@ RpcEventsWsClient.prototype.open = function () {
     self.socket.onmessage = function (evt) {
       self.receive(evt.data)
     }
-    self.init(function (err) {
-      if (err) {
-        self.emit('error', err)
-      } else {
-        RpcEmitter.prototype.open.call(self)
-        while (self.state === 'open' && self._connectQueue.length) {
-          var queued = self._connectQueue.shift()
-          clearTimeout(queued[2])
+    self.init(function () {
+      RpcEmitter.prototype.open.call(self)
+      while (self._connectQueue.length) {
+        var queued = self._connectQueue.shift()
+        clearTimeout(queued[2])
+        if (self.state === 'open') {
           RpcEmitter.prototype._dosend.call(self, queued[0], queued[1])
         }
       }
